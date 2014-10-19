@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 # Personal Activity Monitoring Device Data Analysis
 
 This document analyizes data collected from a personal fitness monitor device
@@ -18,7 +13,8 @@ format using the 'lubridate' package. The 'interval' variable is converted to a
 factor. Finally, a new column is created containing the day of the year for each
 entry.
 
-``` {r loadingProcessing}
+
+```r
 library(lubridate)
 # read in data
 steps_data <- read.csv("activity.csv", stringsAsFactors = FALSE)
@@ -37,7 +33,8 @@ This histogram shows the frequency of the total number of steps in a day for the
 ignored in the step count.  Since there are several days with large numbers of NA
 values, there is a high frequency of days with less than 1000 steps.
 
-``` {r centralTendency}
+
+```r
 # calculate the total number of steps per day of the year, ignoring NAs
 steps_data_bydate <- tapply(steps_data$steps, 
                             steps_data$year_day, 
@@ -49,22 +46,27 @@ hist(steps_data_bydate,
      main = "Histogram of Total Steps Per Day", 
      xlab = "Total Steps",
      col = "blue")
+```
 
+![plot of chunk centralTendency](./PA1_template_files/figure-html/centralTendency.png) 
+
+```r
 # calculate mean and median
 mean_steps <- mean(steps_data_bydate, na.rm = TRUE)
 median_steps <- median(steps_data_bydate, na.rm = TRUE)
 ```
 
-The mean number of steps per day is `r sprintf("%.2f", mean_steps)`.
+The mean number of steps per day is 9354.23.
 
-The median number of steps per day is `r median_steps`.
+The median number of steps per day is 10395.
 
 ## What is the average daily activity pattern?
 
 The average number of steps per interval across all 61 days in the study is 
 calculated and used to visualize average activity for each interval of the day.
 
-```{r averageDailyPattern}
+
+```r
 # calculate the average number of steps per interval across all days
 mean_steps_per_interval <- tapply(steps_data$steps, 
                          steps_data$interval, 
@@ -81,12 +83,16 @@ plot(levels(steps_data$interval),
      
 # modify x axis tick locations
 axis(1, at = c(0, 600, 1200, 1800, 2355))
+```
 
+![plot of chunk averageDailyPattern](./PA1_template_files/figure-html/averageDailyPattern.png) 
+
+```r
 # determine interval with maximum average number of steps
 max_interval <- names(which.max(mean_steps_per_interval))
 ```
 
-The interval containing the maximum mean number of steps is `r max_interval`.
+The interval containing the maximum mean number of steps is 835.
 
 ## Imputing missing values
 
@@ -95,7 +101,8 @@ days is used.  These values rounded to nearest number of steps and are then used
 to replace NA values.  As a result of imputing values, the total number of steps 
 for several days is moved closer to the mean value for the sample. 
 
-```{r imputing}
+
+```r
 # calculate total number entries with NA in dataset
 total_NAs <- sum(!complete.cases(steps_data))
 
@@ -118,17 +125,21 @@ hist(steps_data_bydate_noNAs,
      main = "Histogram of Total Steps Per Day (Imputing Missing Values)", 
      xlab = "Total Steps",
      col = "blue")
+```
 
+![plot of chunk imputing](./PA1_template_files/figure-html/imputing.png) 
+
+```r
 # calculate mean and median of distribution
 mean_steps_noNAs <- mean(steps_data_bydate_noNAs, na.rm = TRUE)
 median_steps_noNAs <- median(steps_data_bydate_noNAs, na.rm = TRUE)
 ```
 
-There were a total of `r total_NAs` NAs in the original dataset.
+There were a total of 2304 NAs in the original dataset.
 
-The mean number of steps per day with value imputing is `r sprintf("%.2f", mean_steps_noNAs)`.
+The mean number of steps per day with value imputing is 10765.64.
 
-The median number of steps per day with value imputing is `r median_steps_noNAs`.
+The median number of steps per day with value imputing is 10762.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -137,7 +148,8 @@ average number of steps per interval is calculated separately for weekdays and
 weekends.  There is a clear peak in activity on weekdays at around 8:30 AM, whereas
 on weekends there is a higher average activity sustained throughout the day.
 
-```{r weekdayVsWeekend}
+
+```r
 # new column created reporting weekday/weekend
 steps_data$weekend <- wday(steps_data$date) %in% c(1,7)
 steps_data$weekend <- factor(steps_data$weekend, 
@@ -176,3 +188,5 @@ p1 <- xyplot(mean_steps ~ interval | wkday_wkend,
        layout = c(1, 2))
 print(p1)
 ```
+
+![plot of chunk weekdayVsWeekend](./PA1_template_files/figure-html/weekdayVsWeekend.png) 
